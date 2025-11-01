@@ -1,7 +1,7 @@
 import React, { useState, FormEvent } from 'react';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
-import { TestFlowLogo, EyeIcon, EyeSlashIcon, GoogleIcon } from '../components/icons/Icons';
+import { TestFlowLogo, EyeIcon, EyeSlashIcon, GoogleIcon, ExclamationCircleIcon } from '../components/icons/Icons';
 import {
   loginWithEmail,
   registerWithEmail,
@@ -31,6 +31,17 @@ const AuthPage: React.FC = () => {
     e.preventDefault();
     setError('');
     
+    // Check if email or password is empty
+    if (!email.trim()) {
+      setError('Please enter your email address.');
+      return;
+    }
+
+    if (!password.trim()) {
+      setError('Please enter your password.');
+      return;
+    }
+
     // Validate email format before sending request
     if (!validateEmail(email)) {
       setError('Invalid email format. Please enter a valid email address (e.g., user@example.com).');
@@ -106,8 +117,9 @@ const AuthPage: React.FC = () => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
-            <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-500 text-sm">
-              {error}
+            <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm error-animate flex items-start gap-3 shadow-lg shadow-red-500/10 backdrop-blur-sm">
+              <ExclamationCircleIcon className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5 animate-pulse" />
+              <span className="flex-1 leading-relaxed">{error}</span>
             </div>
           )}
 
@@ -120,7 +132,6 @@ const AuthPage: React.FC = () => {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required
               className="w-full px-4 py-3 bg-surface2 border border-surface2 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-violet text-primary"
               placeholder="Email"
               disabled={loading || googleLoading}
@@ -137,8 +148,6 @@ const AuthPage: React.FC = () => {
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                required
-                minLength={6}
                 className="w-full px-4 py-3 pr-12 bg-surface2 border border-surface2 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-violet text-primary"
                 placeholder="Enter password"
                 disabled={loading || googleLoading}
@@ -167,7 +176,7 @@ const AuthPage: React.FC = () => {
           <Button
             type="submit"
             className="w-full"
-            disabled={loading || googleLoading || !email || !password}
+            disabled={loading || googleLoading}
           >
             {loading
               ? 'Processing...'

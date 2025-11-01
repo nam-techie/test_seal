@@ -36,38 +36,42 @@ const TopBar: React.FC = () => {
         <button className="p-2 rounded-full hover:bg-surface2">
           <BellIcon className="text-primary-muted" />
         </button>
-        <div className="relative">
-          <button
-            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className="w-10 h-10 rounded-full bg-surface2 flex items-center justify-center overflow-hidden"
-          >
-            <img src={avatarUrl} alt="User avatar" />
-          </button>
-          {isDropdownOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-surface2 rounded-xl shadow-lg py-2 z-20">
-              <div className="px-4 py-2 text-xs text-primary-muted border-b border-surface mb-1">
-                {currentUser?.email}
-              </div>
-              <a
-                href="#/profile"
-                className="flex items-center px-4 py-2 text-sm text-primary-muted hover:bg-surface hover:text-white"
-              >
-                <UserIcon className="mr-3" /> Profile
-              </a>
-              <a
-                href="#/settings"
-                className="flex items-center px-4 py-2 text-sm text-primary-muted hover:bg-surface hover:text-white"
-              >
-                <CogIcon className="mr-3" /> Settings
-              </a>
-              <button
-                onClick={handleLogout}
-                className="w-full text-left flex items-center px-4 py-2 text-sm text-primary-muted hover:bg-surface hover:text-white"
-              >
-                <LogoutIcon className="mr-3" /> Đăng xuất
-              </button>
-            </div>
+        <div className="flex items-center space-x-3">
+          {currentUser?.email && (
+            <span className="text-sm text-primary-muted hidden sm:block">
+              Hello, {currentUser.email}
+            </span>
           )}
+          <div className="relative">
+            <button
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="w-10 h-10 rounded-full bg-surface2 flex items-center justify-center overflow-hidden"
+            >
+              <img src={avatarUrl} alt="User avatar" />
+            </button>
+            {isDropdownOpen && (
+              <div className="absolute right-0 mt-2 w-48 bg-surface2 rounded-xl shadow-lg py-2 z-20">
+                <a
+                  href="#/profile"
+                  className="flex items-center px-4 py-2 text-sm text-primary-muted hover:bg-surface hover:text-white"
+                >
+                  <UserIcon className="w-4 h-4 mr-3" /> Profile
+                </a>
+                <a
+                  href="#/settings"
+                  className="flex items-center px-4 py-2 text-sm text-primary-muted hover:bg-surface hover:text-white"
+                >
+                  <CogIcon className="w-4 h-4 mr-3" /> Settings
+                </a>
+                <button
+                  onClick={handleLogout}
+                  className="w-full text-left flex items-center px-4 py-2 text-sm text-primary-muted hover:bg-surface hover:text-white"
+                >
+                  <LogoutIcon className="w-4 h-4 mr-3" /> Logout
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </header>

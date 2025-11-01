@@ -1,8 +1,12 @@
 import React, { useState, FormEvent } from 'react';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
-import { TestFlowLogo } from '../components/icons/Icons';
-import { loginWithEmail, registerWithEmail, getAuthErrorMessage } from '../services/auth';
+import { TestFlowLogo, EyeIcon, EyeSlashIcon } from '../components/icons/Icons';
+import {
+  loginWithEmail,
+  registerWithEmail,
+  getAuthErrorMessage,
+} from '../services/auth';
 import { AuthError } from 'firebase/auth';
 
 type AuthMode = 'login' | 'signup';
@@ -11,12 +15,32 @@ const AuthPage: React.FC = () => {
   const [mode, setMode] = useState<AuthMode>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Validate email format
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError('');
+    
+    // Validate email format before sending request
+    if (!validateEmail(email)) {
+      setError('Invalid email format. Please enter a valid email address (e.g., user@example.com).');
+      return;
+    }
+
+    // Validate password length
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters long.');
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -29,7 +53,8 @@ const AuthPage: React.FC = () => {
       // App sẽ tự động redirect
     } catch (err) {
       const authError = err as AuthError;
-      setError(getAuthErrorMessage(authError));
+      // Truyền mode vào để hiển thị thông báo phù hợp
+      setError(getAuthErrorMessage(authError, mode));
     } finally {
       setLoading(false);
     }
@@ -40,6 +65,7 @@ const AuthPage: React.FC = () => {
     setError('');
     setEmail('');
     setPassword('');
+    setShowPassword(false);
   };
 
   return (
@@ -50,12 +76,12 @@ const AuthPage: React.FC = () => {
       <Card className="w-full max-w-md" glow={true}>
         <div className="text-center mb-6">
           <h1 className="text-3xl font-bold mb-2">
-            {mode === 'login' ? 'Đăng nhập' : 'Đăng ký'} TestFlow AI
+            {mode === 'login' ? 'Sign in to' : 'Sign up for'} TestFlow AI
           </h1>
           <p className="text-primary-muted">
             {mode === 'login'
-              ? 'Bắt đầu hành trình kiểm thử AI của bạn.'
-              : 'Tạo tài khoản mới để bắt đầu.'}
+              ? 'Start your AI-powered testing journey.'
+              : 'Create a new account to get started.'}
           </p>
         </div>
 
@@ -77,29 +103,44 @@ const AuthPage: React.FC = () => {
               onChange={(e) => setEmail(e.target.value)}
               required
               className="w-full px-4 py-3 bg-surface2 border border-surface2 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-violet text-primary"
-              placeholder="your.email@example.com"
+              placeholder="Email"
               disabled={loading}
             />
           </div>
 
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-primary mb-2">
-              Mật khẩu
+              Password
             </label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength={6}
-              className="w-full px-4 py-3 bg-surface2 border border-surface2 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-violet text-primary"
-              placeholder="••••••••"
-              disabled={loading}
-            />
+            <div className="relative">
+              <input
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                minLength={6}
+                className="w-full px-4 py-3 pr-12 bg-surface2 border border-surface2 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-violet text-primary"
+                placeholder="Enter password"
+                disabled={loading}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-primary-muted hover:text-primary transition-colors focus:outline-none"
+                disabled={loading}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? (
+                  <EyeSlashIcon className="w-5 h-5" />
+                ) : (
+                  <EyeIcon className="w-5 h-5" />
+                )}
+              </button>
+            </div>
             {mode === 'signup' && (
               <p className="text-xs text-primary-muted mt-1">
-                Mật khẩu phải có ít nhất 6 ký tự
+                Password must be at least 6 characters
               </p>
             )}
           </div>
@@ -110,10 +151,10 @@ const AuthPage: React.FC = () => {
             disabled={loading || !email || !password}
           >
             {loading
-              ? 'Đang xử lý...'
+              ? 'Processing...'
               : mode === 'login'
-              ? 'Đăng nhập'
-              : 'Đăng ký'}
+              ? 'Sign In'
+              : 'Sign Up'}
           </Button>
         </form>
 
@@ -125,26 +166,26 @@ const AuthPage: React.FC = () => {
           >
             {mode === 'login' ? (
               <>
-                Chưa có tài khoản?{' '}
-                <span className="font-semibold underline">Đăng ký ngay</span>
+                Don't have an account?{' '}
+                <span className="font-semibold underline">Sign up</span>
               </>
             ) : (
               <>
-                Đã có tài khoản?{' '}
-                <span className="font-semibold underline">Đăng nhập</span>
+                Already have an account?{' '}
+                <span className="font-semibold underline">Sign in</span>
               </>
             )}
           </button>
         </div>
 
         <p className="text-xs text-primary-muted text-center mt-8">
-          Bằng cách đăng nhập, bạn đồng ý với{' '}
+          By signing in, you agree to our{' '}
           <a href="#" className="underline hover:text-primary">
-            Điều khoản
+            Terms
           </a>{' '}
           &{' '}
           <a href="#" className="underline hover:text-primary">
-            Chính sách bảo mật
+            Privacy Policy
           </a>
           .
         </p>

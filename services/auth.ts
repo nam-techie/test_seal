@@ -57,28 +57,44 @@ export const logout = async (): Promise<void> => {
 };
 
 /**
- * Chuyển đổi Firebase error code sang message tiếng Việt
+ * Convert Firebase error code to English error message
  */
-export const getAuthErrorMessage = (error: AuthError): string => {
+export const getAuthErrorMessage = (error: AuthError, mode: 'login' | 'signup' = 'login'): string => {
   switch (error.code) {
     case 'auth/invalid-email':
-      return 'Email không hợp lệ';
+      return 'Invalid email format. Please check your email address.';
     case 'auth/user-disabled':
-      return 'Tài khoản này đã bị vô hiệu hóa';
+      return 'This account has been disabled. Please contact support.';
     case 'auth/user-not-found':
-      return 'Không tìm thấy tài khoản với email này';
+      return 'No account found with this email. Please check your email or sign up for a new account.';
     case 'auth/wrong-password':
-      return 'Mật khẩu không đúng';
+      return 'Incorrect password. Please try again.';
+    case 'auth/invalid-credential':
+      // Firebase doesn't distinguish between wrong email or password for security
+      // But we can display a clearer message
+      if (mode === 'login') {
+        return 'Invalid email or password. Please check your login again.';
+      } else {
+        return 'Invalid login credentials.';
+      }
     case 'auth/email-already-in-use':
-      return 'Email này đã được sử dụng';
+      return 'This email is already in use. Please sign in or use a different email.';
     case 'auth/weak-password':
-      return 'Mật khẩu quá yếu (cần ít nhất 6 ký tự)';
+      return 'Password is too weak. Password must be at least 6 characters.';
     case 'auth/network-request-failed':
-      return 'Lỗi kết nối mạng. Vui lòng thử lại';
+      return 'Network error. Please check your internet connection and try again.';
     case 'auth/too-many-requests':
-      return 'Quá nhiều yêu cầu. Vui lòng thử lại sau';
+      return 'Too many login attempts. Please try again in a few minutes.';
+    case 'auth/operation-not-allowed':
+      return 'This sign-in method is not enabled. Please contact support.';
     default:
-      return error.message || 'Đã xảy ra lỗi. Vui lòng thử lại';
+      // If error message contains "invalid-credential", display clear message
+      if (error.message?.includes('invalid-credential') || error.message?.includes('INVALID_LOGIN_CREDENTIALS')) {
+        return mode === 'login'
+          ? 'Invalid email or password. Please check your login credentials.'
+          : 'Invalid login credentials.';
+      }
+      return error.message || 'An error occurred. Please try again.';
   }
 };
 

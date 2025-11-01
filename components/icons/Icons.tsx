@@ -35,7 +35,7 @@ export const TestFlowLogo = () => (
         <div className="w-8 h-8 bg-gradient-g1 rounded-lg flex items-center justify-center">
             <BeakerIcon className="w-5 h-5 text-white" />
         </div>
-        <span className="text-xl font-bold text-white">TestFlow AI</span>
+        <span className="text-xl font-bold text-white">Test Studio AI</span>
     </div>
 );
 
@@ -111,22 +111,31 @@ export const DocumentArrowDownIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <Icon {...props}><path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></Icon>
 );
 
-export const CheckBadgeIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <Icon {...props}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" /></Icon>
+export const EyeIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <Icon {...props}><path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></Icon>
 );
 
-export const XMarkIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <Icon {...props}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></Icon>
+export const EyeSlashIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <Icon {...props}><path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 01-4.244-4.244m4.244 4.244L9.88 9.88" /></Icon>
 );
 
-export const ArrowTrendingUpIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <Icon {...props}><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.94" /></Icon>
-);
-
-export const ArrowTrendingDownIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <Icon {...props}><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6L9 12.75l4.306-4.307a11.95 11.95 0 015.814 5.519l2.74 1.22m0 0l-5.94 2.28m5.94-2.28l-2.28-5.94" /></Icon>
-);
-
-export const RefreshIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <Icon {...props}><path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.25 9.348h4.992m-4.992 0a3.75 3.75 0 106.371-4.399 3.75 3.75 0 00-6.371 4.399zm12.75 0a3.75 3.75 0 10-6.371-4.399 3.75 3.75 0 006.371 4.399zm-6.371-4.399a3.75 3.75 0 00-6.371-4.399" /></Icon>
+export const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 24 24" width="20" height="20" {...props}>
+    <path
+      fill="#4285F4"
+      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+    />
+    <path
+      fill="#34A853"
+      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+    />
+    <path
+      fill="#FBBC05"
+      d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+    />
+    <path
+      fill="#EA4335"
+      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+    />
+  </svg>
 );

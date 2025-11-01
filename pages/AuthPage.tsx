@@ -1,10 +1,11 @@
 import React, { useState, FormEvent } from 'react';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
-import { TestFlowLogo, EyeIcon, EyeSlashIcon } from '../components/icons/Icons';
+import { TestFlowLogo, EyeIcon, EyeSlashIcon, GoogleIcon } from '../components/icons/Icons';
 import {
   loginWithEmail,
   registerWithEmail,
+  loginWithGoogle,
   getAuthErrorMessage,
 } from '../services/auth';
 import { AuthError } from 'firebase/auth';
@@ -18,6 +19,7 @@ const AuthPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
 
   // Validate email format
   const validateEmail = (email: string): boolean => {
@@ -60,6 +62,23 @@ const AuthPage: React.FC = () => {
     }
   };
 
+  const handleGoogleSignIn = async () => {
+    setError('');
+    setGoogleLoading(true);
+
+    try {
+      await loginWithGoogle();
+      // Authentication state sẽ được cập nhật tự động qua AuthContext
+      // App sẽ tự động redirect
+    } catch (err) {
+      const authError = err as AuthError;
+      // Không cần truyền mode cho Google auth
+      setError(getAuthErrorMessage(authError));
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
+
   const switchMode = () => {
     setMode(mode === 'login' ? 'signup' : 'login');
     setError('');
@@ -76,7 +95,7 @@ const AuthPage: React.FC = () => {
       <Card className="w-full max-w-md" glow={true}>
         <div className="text-center mb-6">
           <h1 className="text-3xl font-bold mb-2">
-            {mode === 'login' ? 'Sign in to' : 'Sign up for'} TestFlow AI
+            {mode === 'login' ? 'Sign in to' : 'Sign up for'} Test Studio AI
           </h1>
           <p className="text-primary-muted">
             {mode === 'login'
@@ -104,7 +123,7 @@ const AuthPage: React.FC = () => {
               required
               className="w-full px-4 py-3 bg-surface2 border border-surface2 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-violet text-primary"
               placeholder="Email"
-              disabled={loading}
+              disabled={loading || googleLoading}
             />
           </div>
 
@@ -122,13 +141,13 @@ const AuthPage: React.FC = () => {
                 minLength={6}
                 className="w-full px-4 py-3 pr-12 bg-surface2 border border-surface2 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-violet text-primary"
                 placeholder="Enter password"
-                disabled={loading}
+                disabled={loading || googleLoading}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-primary-muted hover:text-primary transition-colors focus:outline-none"
-                disabled={loading}
+                disabled={loading || googleLoading}
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
               >
                 {showPassword ? (
@@ -148,7 +167,7 @@ const AuthPage: React.FC = () => {
           <Button
             type="submit"
             className="w-full"
-            disabled={loading || !email || !password}
+            disabled={loading || googleLoading || !email || !password}
           >
             {loading
               ? 'Processing...'
@@ -158,11 +177,33 @@ const AuthPage: React.FC = () => {
           </Button>
         </form>
 
+        <div className="mt-6">
+          <div className="relative mb-4">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-surface2"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-background text-primary-muted">or</span>
+            </div>
+          </div>
+
+          <Button
+            type="button"
+            onClick={handleGoogleSignIn}
+            className="w-full flex items-center justify-center"
+            variant="secondary"
+            disabled={googleLoading || loading}
+          >
+            <GoogleIcon className="mr-3" />
+            {googleLoading ? 'Signing in...' : 'Continue with Google'}
+          </Button>
+        </div>
+
         <div className="mt-6 text-center">
           <button
             onClick={switchMode}
             className="text-sm text-primary-muted hover:text-primary transition-colors"
-            disabled={loading}
+            disabled={loading || googleLoading}
           >
             {mode === 'login' ? (
               <>

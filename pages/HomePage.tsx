@@ -81,7 +81,7 @@ const HomePage = () => {
     return (
         <div className="space-y-8">
             <div className="text-center p-12 rounded-2xl bg-gradient-g2">
-                <h1 className="text-4xl font-extrabold text-white mb-2">Welcome to TestFlow AI</h1>
+                <h1 className="text-4xl font-extrabold text-white mb-2">Welcome to Test Studio AI</h1>
                 <p className="text-lg text-primary-muted max-w-2xl mx-auto">
                     The intelligent testing agent that analyzes your code, suggests tests, and automates execution and reporting.
                 </p>

@@ -15,7 +15,7 @@ const Layout: React.FC = () => {
           </div>
         </main>
         <footer className="text-center p-4 text-primary-muted text-xs">
-          © {new Date().getFullYear()} TestFlow AI
+          © {new Date().getFullYear()} Test Studio AI
         </footer>
       </div>
     </div>

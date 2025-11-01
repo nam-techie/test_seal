@@ -2,6 +2,8 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signOut,
+  signInWithPopup,
+  GoogleAuthProvider,
   User,
   AuthError,
 } from 'firebase/auth';
@@ -46,7 +48,20 @@ export const registerWithEmail = async (
 };
 
 /**
- * Đăng xuất
+ * Sign in with Google
+ */
+export const loginWithGoogle = async (): Promise<User> => {
+  try {
+    const provider = new GoogleAuthProvider();
+    const userCredential = await signInWithPopup(auth, provider);
+    return userCredential.user;
+  } catch (error) {
+    throw error as AuthError;
+  }
+};
+
+/**
+ * Logout
  */
 export const logout = async (): Promise<void> => {
   try {
@@ -87,6 +102,14 @@ export const getAuthErrorMessage = (error: AuthError, mode: 'login' | 'signup' =
       return 'Too many login attempts. Please try again in a few minutes.';
     case 'auth/operation-not-allowed':
       return 'This sign-in method is not enabled. Please contact support.';
+    case 'auth/popup-closed-by-user':
+      return 'Sign-in was cancelled. Please try again.';
+    case 'auth/popup-blocked':
+      return 'Popup was blocked by your browser. Please allow popups for this site and try again.';
+    case 'auth/cancelled-popup-request':
+      return 'Only one popup request is allowed at a time. Please try again.';
+    case 'auth/account-exists-with-different-credential':
+      return 'An account with this email already exists with a different sign-in method. Please use that method to sign in.';
     default:
       // If error message contains "invalid-credential", display clear message
       if (error.message?.includes('invalid-credential') || error.message?.includes('INVALID_LOGIN_CREDENTIALS')) {

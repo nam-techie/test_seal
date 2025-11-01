@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TestFlow AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+            },
+            colors: {
+              background: '#0B1020',
+              surface: '#11162A',
+              surface2: '#151B33',
+              primary: {
+                DEFAULT: '#E5E7EB',
+                muted: '#94A3B8'
+              },
+              accent: {
+                cyan: '#22D3EE',
+                violet: '#7C3AED',
+              },
+              status: {
+                success: '#10B981',
+                danger: '#EF4444',
+                warning: '#F59E0B',
+              }
+            },
+            backgroundImage: {
+              'gradient-g1': 'linear-gradient(90deg, #22D3EE, #7C3AED)',
+              'gradient-g2': 'radial-gradient(circle, rgba(124,58,237,0.25), transparent 70%)',
+            },
+            boxShadow: {
+              'glow-g3': '0 0 25px -5px rgba(124, 58, 237, 0.35)',
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        background-color: #0B1020;
+        font-family: 'Inter', sans-serif;
+        color: #E5E7EB;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "recharts": "https://aistudiocdn.com/recharts@^3.3.0",
+    "react-router-dom": "https://aistudiocdn.com/react-router-dom@^7.9.5",
+    "react-dom": "https://aistudiocdn.com/react-dom@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+    <!-- Dependencies -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>

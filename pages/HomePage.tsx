@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
@@ -8,21 +8,70 @@ import { GithubIcon, CodeBracketIcon, UploadIcon, XIcon, BeakerIcon, PlayIcon, C
 const HomePage = () => {
     const navigate = useNavigate();
     const [files, setFiles] = useState<File[]>([]);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const handleAnalyze = () => {
+    const handleAnalyze = (e?: React.MouseEvent) => {
+        // Ngăn event bubbling nếu có event
+        if (e) {
+            e.stopPropagation();
+        }
         // Here you would typically trigger an API call
         // For now, we just navigate to the analyze page
         navigate('/analyze');
     };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files) {
-            setFiles(Array.from(e.target.files));
+        if (e.target.files && e.target.files.length > 0) {
+            const newFiles = Array.from(e.target.files) as File[];
+            // Giới hạn tối đa 10 files và kiểm tra kích thước 1MB mỗi file
+            const validFiles = newFiles
+                .filter(file => file.size <= 1024 * 1024) // 1MB = 1024 * 1024 bytes
+                .slice(0, 10);
+            setFiles(validFiles);
+            // Reset input để có thể chọn lại file cùng tên
+            if (fileInputRef.current) {
+                fileInputRef.current.value = '';
+            }
         }
     };
 
-    const removeFile = (fileName: string) => {
+    const removeFile = (e: React.MouseEvent, fileName: string) => {
+        // Ngăn event bubbling để không trigger drop zone click
+        e.stopPropagation();
         setFiles(files.filter(file => file.name !== fileName));
+    };
+
+    const handleDropZoneClick = () => {
+        // Chỉ trigger input file khi click vào drop zone
+        if (fileInputRef.current) {
+            fileInputRef.current.click();
+        }
+    };
+
+    const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+        // Ngăn chặn default behavior để cho phép drop
+        e.preventDefault();
+        e.stopPropagation();
+    };
+
+    const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+        // Ngăn chặn default behavior
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // Lấy files từ drag event
+        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+            const newFiles = Array.from(e.dataTransfer.files) as File[];
+            // Giới hạn tối đa 10 files và kiểm tra kích thước 1MB mỗi file
+            const validFiles = newFiles
+                .filter(file => file.size <= 1024 * 1024) // 1MB = 1024 * 1024 bytes
+                .slice(0, 10);
+            setFiles(validFiles);
+            // Reset input
+            if (fileInputRef.current) {
+                fileInputRef.current.value = '';
+            }
+        }
     };
 
     const tabs = [
@@ -53,11 +102,23 @@ const HomePage = () => {
             label: 'Upload Files',
             content: (
                 <div className="space-y-4">
-                    <div className="border-2 border-dashed border-surface2 rounded-lg p-8 text-center">
+                    <div 
+                        className="border-2 border-dashed border-surface2 rounded-lg p-8 text-center relative cursor-pointer"
+                        onClick={handleDropZoneClick}
+                        onDragOver={handleDragOver}
+                        onDrop={handleDrop}
+                    >
                         <UploadIcon className="mx-auto h-12 w-12 text-primary-muted" />
                         <p className="mt-2 text-sm text-primary-muted">Drag & drop files or click to browse</p>
                         <p className="text-xs text-primary-muted/70">Max 10 files, 1MB per file</p>
-                        <input type="file" multiple onChange={handleFileChange} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+                        <input 
+                            ref={fileInputRef}
+                            type="file" 
+                            multiple 
+                            onChange={handleFileChange} 
+                            className="hidden" 
+                            accept="*/*"
+                        />
                     </div>
                     {files.length > 0 && (
                         <div className="flex flex-wrap gap-2">
@@ -65,14 +126,14 @@ const HomePage = () => {
                                 <div key={file.name} className="bg-surface2 rounded-full py-1 pl-3 pr-2 flex items-center text-sm">
                                     <span>{file.name}</span>
                                     <span className="text-xs text-primary-muted ml-2">{Math.round(file.size / 1024)} KB</span>
-                                    <button onClick={() => removeFile(file.name)} className="ml-2 hover:text-status-danger">
+                                    <button onClick={(e) => removeFile(e, file.name)} className="ml-2 hover:text-status-danger">
                                         <XIcon className="w-4 h-4" />
                                     </button>
                                 </div>
                             ))}
                         </div>
                     )}
-                     <Button onClick={handleAnalyze} className="w-full" disabled={files.length === 0}>Analyze Files</Button>
+                     <Button onClick={handleAnalyze} className="w-full relative z-10" disabled={files.length === 0}>Analyze Files</Button>
                 </div>
             )
         }

@@ -110,3 +110,23 @@ export const EllipsisVerticalIcon = (props: React.SVGProps<SVGSVGElement>) => (
 export const DocumentArrowDownIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <Icon {...props}><path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" /></Icon>
 );
+
+export const CheckBadgeIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <Icon {...props}><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" /></Icon>
+);
+
+export const XMarkIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <Icon {...props}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></Icon>
+);
+
+export const ArrowTrendingUpIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <Icon {...props}><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.94" /></Icon>
+);
+
+export const ArrowTrendingDownIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <Icon {...props}><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6L9 12.75l4.306-4.307a11.95 11.95 0 015.814 5.519l2.74 1.22m0 0l-5.94 2.28m5.94-2.28l-2.28-5.94" /></Icon>
+);
+
+export const RefreshIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <Icon {...props}><path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.25 9.348h4.992m-4.992 0a3.75 3.75 0 106.371-4.399 3.75 3.75 0 00-6.371 4.399zm12.75 0a3.75 3.75 0 10-6.371-4.399 3.75 3.75 0 006.371 4.399zm-6.371-4.399a3.75 3.75 0 00-6.371-4.399" /></Icon>
+);

@@ -2,14 +2,14 @@
 
 File này hướng dẫn bạn cách thiết lập Firebase Authentication cho dự án TestFlow AI.
 
-## 📋 Bước 1: Tạo Firebase Project
+##  Bước 1: Tạo Firebase Project
 
 1. Truy cập [Firebase Console](https://console.firebase.google.com/)
 2. Click **"Add project"** hoặc chọn project có sẵn
 3. Nhập tên project và chọn region (ví dụ: `us-central`, `asia-southeast1`)
 4. Click **"Create project"** và đợi Firebase khởi tạo
 
-## 📋 Bước 2: Đăng ký Web App
+##  Bước 2: Đăng ký Web App
 
 1. Trong Firebase Console, vào **Project Settings** (biểu tượng bánh răng)
 2. Scroll xuống phần **"Your apps"**, click **"Add app"** → chọn icon **Web** (`</>`)
@@ -18,7 +18,7 @@ File này hướng dẫn bạn cách thiết lập Firebase Authentication cho d
 5. Click **"Register app"**
 6. Bạn sẽ thấy Firebase configuration object. **SAO CHÉP** toàn bộ thông tin này
 
-## 📋 Bước 3: Bật Email/Password Authentication
+##  Bước 3: Bật Email/Password Authentication
 
 1. Trong Firebase Console, vào menu **Authentication**
 2. Click tab **"Sign-in method"**
@@ -27,14 +27,14 @@ File này hướng dẫn bạn cách thiết lập Firebase Authentication cho d
 5. (Tùy chọn) Có thể bật **"Email link (passwordless sign-in)"** nếu muốn
 6. Click **"Save"**
 
-## 📋 Bước 4: Cấu hình Authorized Domains (nếu cần)
+##  Bước 4: Cấu hình Authorized Domains (nếu cần)
 
 1. Trong **Authentication** → **Settings** → **Authorized domains**
 2. Đảm bảo các domain sau được thêm:
    - `localhost` (đã có sẵn)
    - Domain production của bạn (nếu có)
 
-## 📋 Bước 5: Lấy Firebase Config và tạo file .env
+##  Bước 5: Lấy Firebase Config và tạo file .env
 
 1. Quay lại **Project Settings** → **General** → **Your apps**
 2. Tìm app web bạn vừa tạo, click vào nó
@@ -73,7 +73,7 @@ VITE_FIREBASE_MESSAGING_SENDER_ID=123456789012
 VITE_FIREBASE_APP_ID=1:123456789012:web:abcdef123456
 ```
 
-## 📋 Bước 6: Cài đặt dependencies và chạy ứng dụng
+##  Bước 6: Cài đặt dependencies và chạy ứng dụng
 
 1. Cài đặt packages:
 ```bash
@@ -87,7 +87,7 @@ npm run dev
 
 3. Mở trình duyệt tại `http://localhost:3000`
 
-## ✅ Kiểm tra hoạt động
+##  Kiểm tra hoạt động
 
 1. Vào trang login (`http://localhost:3000/#/login`)
 2. Click **"Đăng ký ngay"** để tạo tài khoản mới

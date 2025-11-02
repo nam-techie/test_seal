@@ -10,6 +10,7 @@ import ExecutionPage from './pages/ExecutionPage';
 import DashboardPage from './pages/DashboardPage';
 import HistoryPage from './pages/HistoryPage';
 import SettingsPage from './pages/SettingsPage';
+import RequirementPage from './pages/RequirementPage';
 
 function AppRoutes() {
   const { currentUser, loading } = useAuth();
@@ -30,6 +31,7 @@ function AppRoutes() {
           <Route index element={<Navigate to="/home" replace />} />
           <Route path="home" element={<HomePage />} />
           <Route path="analyze" element={<AnalyzePage />} />
+          <Route path="requirement" element={<RequirementPage />} />
           <Route path="runs" element={<ExecutionPage />} />
           <Route path="dashboard" element={<DashboardPage />} />
           <Route path="history" element={<HistoryPage />} />

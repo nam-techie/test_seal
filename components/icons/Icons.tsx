@@ -27,6 +27,8 @@ import {
   RefreshCw,
   Eye,
   EyeOff,
+  FileCheck,
+  AlertTriangle,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -65,6 +67,8 @@ export const DocumentArrowDownIcon = createIconComponent(Download);
 export const RefreshIcon = createIconComponent(RefreshCw);
 export const EyeIcon = createIconComponent(Eye);
 export const EyeSlashIcon = createIconComponent(EyeOff);
+export const RequirementIcon = createIconComponent(FileCheck);
+export const AlertTriangleIcon = createIconComponent(AlertTriangle);
 
 // TestFlowLogo giữ nguyên (custom component)
 export const TestFlowLogo = () => {

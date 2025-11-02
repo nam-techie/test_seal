@@ -54,3 +54,86 @@ export interface HistoryItem {
   duration: string;
   date: string;
 }
+
+// Requirement Analysis Types
+export interface RequirementDocument {
+  id: string;
+  fileName: string;
+  fileType: 'docx' | 'pdf' | 'md' | 'txt';
+  uploadedAt: string;
+  content: string;
+  size: number;
+}
+
+export interface FunctionalRequirement {
+  id: string;
+  title: string;
+  description: string;
+  clarityScore: number; // 0-100
+  testabilityScore: number; // 0-100
+  conflicts: string[]; // IDs of conflicting requirements
+  suggestions: string[];
+  category?: string;
+}
+
+export interface NonFunctionalRequirement {
+  id: string;
+  title: string;
+  description: string;
+  type: 'performance' | 'security' | 'usability' | 'reliability' | 'scalability' | 'maintainability' | 'other';
+  clarityScore: number; // 0-100
+  testabilityScore: number; // 0-100
+  conflicts: string[]; // IDs of conflicting requirements
+  suggestions: string[];
+  metrics?: string; // KPI cụ thể nếu có
+}
+
+export interface ConflictDetection {
+  id: string;
+  requirementIds: string[]; // IDs of conflicting requirements
+  type: 'contradiction' | 'overlap' | 'dependency' | 'ambiguity';
+  severity: 'low' | 'medium' | 'high';
+  description: string;
+  suggestion: string;
+}
+
+export interface TestabilityScore {
+  requirementId: string;
+  score: number; // 0-100
+  criteria: {
+    clarity: number; // Rõ ràng, dễ hiểu
+    measurability: number; // Có thể đo lường được
+    specificInputOutput: number; // Input/output cụ thể
+    testableConditions: number; // Điều kiện test được
+  };
+  reasoning: string;
+}
+
+export interface RequirementAnalysis {
+  documentId: string;
+  analyzedAt: string;
+  summary: {
+    totalRequirements: number;
+    functionalCount: number;
+    nonFunctionalCount: number;
+    conflictsCount: number;
+    avgClarityScore: number;
+    avgTestabilityScore: number;
+  };
+  functionalRequirements: FunctionalRequirement[];
+  nonFunctionalRequirements: NonFunctionalRequirement[];
+  conflicts: ConflictDetection[];
+  testabilityScores: TestabilityScore[];
+}
+
+export interface TestCaseSuggestion {
+  id: string;
+  requirementId: string;
+  title: string;
+  description: string;
+  given: string;
+  when: string;
+  then: string;
+  priority: 'low' | 'medium' | 'high';
+  type: 'happy_path' | 'edge_case' | 'error_handling' | 'integration';
+}

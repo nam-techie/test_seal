@@ -143,3 +143,9 @@ export const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
     />
   </svg>
 );
+
+export const ChatBubbleIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <Icon {...props}>
+    <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015 21c0-.552.223-1.05.585-1.413L3.662 17.5A8.25 8.25 0 013 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
+  </Icon>
+);

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
@@ -8,6 +8,7 @@ import { GithubIcon, CodeBracketIcon, UploadIcon, XIcon, BeakerIcon, PlayIcon, C
 const HomePage = () => {
     const navigate = useNavigate();
     const [files, setFiles] = useState<File[]>([]);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleAnalyze = () => {
         // Here you would typically trigger an API call
@@ -19,6 +20,21 @@ const HomePage = () => {
         if (e.target.files) {
             setFiles(Array.from(e.target.files));
         }
+    };
+
+    const handleBrowseClick = () => {
+        fileInputRef.current?.click();
+    };
+
+    const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        if (e.dataTransfer.files) {
+            setFiles(Array.from(e.dataTransfer.files));
+        }
+    };
+
+    const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
     };
 
     const removeFile = (fileName: string) => {
@@ -53,11 +69,24 @@ const HomePage = () => {
             label: 'Upload Files',
             content: (
                 <div className="space-y-4">
-                    <div className="border-2 border-dashed border-surface2 rounded-lg p-8 text-center">
-                        <UploadIcon className="mx-auto h-12 w-12 text-primary-muted" />
-                        <p className="mt-2 text-sm text-primary-muted">Drag & drop files or click to browse</p>
-                        <p className="text-xs text-primary-muted/70">Max 10 files, 1MB per file</p>
-                        <input type="file" multiple onChange={handleFileChange} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+                    <div 
+                        className="border-2 border-dashed border-surface2 rounded-lg p-8 text-center relative cursor-pointer"
+                        onDrop={handleDrop}
+                        onDragOver={handleDragOver}
+                        onClick={handleBrowseClick}
+                    >
+                        <input 
+                            type="file" 
+                            ref={fileInputRef}
+                            multiple 
+                            onChange={handleFileChange} 
+                            className="hidden" 
+                        />
+                        <div className="inline-flex flex-col items-center">
+                            <UploadIcon className="h-12 w-12 text-primary-muted" />
+                            <p className="mt-2 text-sm text-primary-muted">Drag & drop files or click to browse</p>
+                        </div>
+                        <p className="text-xs text-primary-muted/70 mt-2">Max 10 files, 1MB per file</p>
                     </div>
                     {files.length > 0 && (
                         <div className="flex flex-wrap gap-2">

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BellIcon, SearchIcon, UserIcon, CogIcon, LogoutIcon } from '../icons/Icons';
+import { BellIcon, SearchIcon, CogIcon, LogoutIcon } from '../icons/Icons';
 import { logout } from '../../services/auth';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -51,12 +51,6 @@ const TopBar: React.FC = () => {
             </button>
             {isDropdownOpen && (
               <div className="absolute right-0 mt-2 w-48 bg-surface2 rounded-xl shadow-lg py-2 z-20">
-                <a
-                  href="#/profile"
-                  className="flex items-center px-4 py-2 text-sm text-primary-muted hover:bg-surface hover:text-white"
-                >
-                  <UserIcon className="w-4 h-4 mr-3" /> Profile
-                </a>
                 <a
                   href="#/settings"
                   className="flex items-center px-4 py-2 text-sm text-primary-muted hover:bg-surface hover:text-white"

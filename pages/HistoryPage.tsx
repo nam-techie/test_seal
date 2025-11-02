@@ -52,17 +52,17 @@ const HistoryPage = () => {
                     </Button>
                     {openMenu === item.runId && (
                         <div className="absolute right-0 mt-2 w-48 bg-surface2 rounded-xl shadow-lg py-2 z-10 border border-surface">
-                            <button className="w-full text-left flex items-center px-4 py-2 text-sm text-primary-muted hover:bg-surface hover:text-white">
+                            <button className="w-full text-left flex items-center px-4 py-2 text-sm text-primary-muted hover:bg-surface2 hover:text-primary">
                                 View Details
                             </button>
                             <div className="border-t border-surface my-1"></div>
-                            <button onClick={() => handleExport(item.runId, 'PDF')} className="w-full text-left flex items-center px-4 py-2 text-sm text-primary-muted hover:bg-surface hover:text-white">
+                            <button onClick={() => handleExport(item.runId, 'PDF')} className="w-full text-left flex items-center px-4 py-2 text-sm text-primary-muted hover:bg-surface2 hover:text-primary">
                                 <DocumentArrowDownIcon className="mr-3 w-5 h-5" /> Export as PDF
                             </button>
-                            <button onClick={() => handleExport(item.runId, 'CSV')} className="w-full text-left flex items-center px-4 py-2 text-sm text-primary-muted hover:bg-surface hover:text-white">
+                            <button onClick={() => handleExport(item.runId, 'CSV')} className="w-full text-left flex items-center px-4 py-2 text-sm text-primary-muted hover:bg-surface2 hover:text-primary">
                                  <DocumentArrowDownIcon className="mr-3 w-5 h-5" /> Export as CSV
                             </button>
-                            <button onClick={() => handleExport(item.runId, 'Excel')} className="w-full text-left flex items-center px-4 py-2 text-sm text-primary-muted hover:bg-surface hover:text-white">
+                            <button onClick={() => handleExport(item.runId, 'Excel')} className="w-full text-left flex items-center px-4 py-2 text-sm text-primary-muted hover:bg-surface2 hover:text-primary">
                                  <DocumentArrowDownIcon className="mr-3 w-5 h-5" /> Export as Excel
                             </button>
                         </div>

@@ -25,8 +25,8 @@ const Sidebar = () => {
                 to={item.path}
                 className={`flex items-center p-3 rounded-xl transition-all duration-200 group relative ${
                   isActive
-                    ? 'bg-surface2 text-white'
-                    : 'text-primary-muted hover:bg-surface2 hover:text-white'
+                    ? 'bg-surface2 text-primary'
+                    : 'text-primary-muted hover:bg-surface2 hover:text-primary'
                 }`}
               >
                 {isActive && (
@@ -35,7 +35,7 @@ const Sidebar = () => {
                 <div className="w-6 h-6">{item.icon}</div>
                 {!isCollapsed && <span className="ml-4 font-medium">{item.label}</span>}
                 {isCollapsed && (
-                    <span className="absolute left-full ml-4 w-max px-2 py-1 bg-surface2 text-white text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                    <span className="absolute left-full ml-4 w-max px-2 py-1 bg-surface2 text-primary text-xs rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
                         {item.label}
                     </span>
                 )}

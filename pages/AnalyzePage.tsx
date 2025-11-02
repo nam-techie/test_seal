@@ -4,6 +4,7 @@ import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Table from '../components/ui/Table';
 import Badge from '../components/ui/Badge';
+import Checkbox from '../components/ui/Checkbox';
 import { mockData } from '../data/mock';
 import { SuggestedTest } from '../types';
 import { DocumentTextIcon, PlayIcon, SparklesIcon } from '../components/icons/Icons';
@@ -55,12 +56,12 @@ const AnalyzePage = () => {
         {
             header: 'Select',
             accessor: (item: SuggestedTest) => (
-                <input
-                    type="checkbox"
-                    checked={item.selected}
-                    onChange={() => handleSelectTest(item.id)}
-                    className="h-5 w-5 rounded bg-surface2 border-surface2 text-accent-violet focus:ring-accent-violet"
-                />
+                <div className="flex justify-center">
+                    <Checkbox
+                        checked={item.selected || false}
+                        onChange={() => handleSelectTest(item.id)}
+                    />
+                </div>
             ),
             className: 'text-center'
         },
@@ -95,8 +96,14 @@ const AnalyzePage = () => {
                         </div>
                         <Table columns={columns} data={tests} />
                         <div className="mt-6 flex justify-end">
-                            <Button onClick={() => navigate('/runs')} disabled={selectedCount === 0} className="flex items-center gap-2">
-                               <PlayIcon/> Run {selectedCount} Selected Test{selectedCount !== 1 && 's'}
+                            <Button 
+                                variant="action" 
+                                onClick={() => navigate('/runs')} 
+                                disabled={selectedCount === 0}
+                                icon={<PlayIcon className="w-4 h-4" />}
+                                className="group min-w-[200px]"
+                            >
+                                Run {selectedCount} Selected Test{selectedCount !== 1 ? 's' : ''}
                             </Button>
                         </div>
                     </Card>

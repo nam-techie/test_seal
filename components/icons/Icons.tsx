@@ -1,41 +1,79 @@
 import React from 'react';
+import {
+  Home,
+  FlaskConical,
+  Play,
+  BarChart3,
+  Clock,
+  Settings,
+  ChevronLeft,
+  Search,
+  Bell,
+  User,
+  LogOut,
+  X,
+  Github,
+  Code2,
+  Upload,
+  CheckCircle2,
+  XCircle,
+  FileText,
+  Clipboard,
+  Sparkles,
+  Terminal,
+  Info,
+  MoreVertical,
+  Download,
+  RefreshCw,
+  Eye,
+  EyeOff,
+  type LucideIcon,
+} from 'lucide-react';
 
-const Icon: React.FC<React.SVGProps<SVGSVGElement>> = (props) => (
-  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6" {...props}>
-    {props.children}
-  </svg>
-);
+// Wrapper component để giữ backward compatibility với API hiện tại
+const createIconComponent = (LucideIcon: LucideIcon) => {
+  return (props: React.SVGProps<SVGSVGElement>) => (
+    <LucideIcon {...props} />
+  );
+};
 
-export const HomeIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <Icon {...props}><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955a1.5 1.5 0 012.122 0l8.954 8.955M2.25 12v8.25a.75.75 0 00.75.75h4.5a.75.75 0 00.75-.75v-4.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75v4.5a.75.75 0 00.75.75h4.5a.75.75 0 00.75-.75V12m-18 0l8.954-8.955a1.5 1.5 0 012.122 0l8.954 8.955" /></Icon>
-);
+// Export các icon với tên giữ nguyên để backward compatible
+export const HomeIcon = createIconComponent(Home);
+export const BeakerIcon = createIconComponent(FlaskConical);
+export const PlayIcon = createIconComponent(Play);
+export const ChartBarIcon = createIconComponent(BarChart3);
+export const ClockIcon = createIconComponent(Clock);
+export const CogIcon = createIconComponent(Settings);
+export const ChevronLeftIcon = createIconComponent(ChevronLeft);
+export const SearchIcon = createIconComponent(Search);
+export const BellIcon = createIconComponent(Bell);
+export const UserIcon = createIconComponent(User);
+export const LogoutIcon = createIconComponent(LogOut);
+export const XIcon = createIconComponent(X);
+export const GithubIcon = createIconComponent(Github);
+export const CodeBracketIcon = createIconComponent(Code2);
+export const UploadIcon = createIconComponent(Upload);
+export const CheckCircleIcon = createIconComponent(CheckCircle2);
+export const XCircleIcon = createIconComponent(XCircle);
+export const DocumentTextIcon = createIconComponent(FileText);
+export const ClipboardIcon = createIconComponent(Clipboard);
+export const SparklesIcon = createIconComponent(Sparkles);
+export const TerminalIcon = createIconComponent(Terminal);
+export const InformationCircleIcon = createIconComponent(Info);
+export const EllipsisVerticalIcon = createIconComponent(MoreVertical);
+export const DocumentArrowDownIcon = createIconComponent(Download);
+export const RefreshIcon = createIconComponent(RefreshCw);
+export const EyeIcon = createIconComponent(Eye);
+export const EyeSlashIcon = createIconComponent(EyeOff);
 
-export const BeakerIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <Icon {...props}><path strokeLinecap="round" strokeLinejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 01-.512 1.422l-3.266 4.354a2.25 2.25 0 00.14 3.251l.298.223a2.25 2.25 0 003.252-.141l3.266-4.354a2.25 2.25 0 01-.512-1.422V3.104a2.25 2.25 0 00-3.252 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M10.5 12.75h3.75M9 21h6" /></Icon>
-);
-
-export const PlayIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <Icon {...props}><path strokeLinecap="round" strokeLinejoin="round" d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.348a1.125 1.125 0 010 1.971l-11.54 6.347a1.125 1.125 0 01-1.667-.985V5.653z" /></Icon>
-);
-
-export const ChartBarIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <Icon {...props}><path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" /></Icon>
-);
-
-export const ClockIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <Icon {...props}><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></Icon>
-);
-
-export const CogIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <Icon {...props}><path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12a7.5 7.5 0 0015 0m-15 0a7.5 7.5 0 1115 0m-15 0H3m18 0h-1.5m-15 0a7.5 7.5 0 1115 0m-15 0H3m18 0h-1.5m-15 0a7.5 7.5 0 1115 0m-15 0H3m18 0h-1.5" /></Icon>
-);
-
-export const TestFlowLogo = () => (
+// TestFlowLogo giữ nguyên (custom component)
+export const TestFlowLogo = () => {
+  return (
     <div className="flex items-center space-x-2">
-        <div className="w-8 h-8 bg-gradient-g1 rounded-lg flex items-center justify-center">
-            <BeakerIcon className="w-5 h-5 text-white" />
-        </div>
-        <span className="text-xl font-bold text-white">Test Studio AI</span>
+      <div className="w-8 h-8 bg-gradient-g1 rounded-lg flex items-center justify-center">
+        <BeakerIcon className="w-5 h-5 text-white" />
+      </div>
+      <span className="text-xl font-bold text-primary">Test Studio AI</span>
     </div>
 );
 

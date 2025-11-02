@@ -1,5 +1,4 @@
 import React, { useState, useRef } from 'react';
-import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
@@ -9,6 +8,8 @@ import { GithubIcon, CodeBracketIcon, UploadIcon, XIcon, BeakerIcon, PlayIcon, C
 const HomePage = () => {
     const navigate = useNavigate();
     const [files, setFiles] = useState<File[]>([]);
+    const [repoName, setRepoName] = useState('');
+    const [branchName, setBranchName] = useState('');
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleAnalyze = (e?: React.MouseEvent) => {
@@ -40,28 +41,6 @@ const HomePage = () => {
         fileInputRef.current?.click();
     };
 
-    const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-        e.preventDefault();
-        if (e.dataTransfer.files) {
-            setFiles(Array.from(e.dataTransfer.files));
-        }
-    };
-
-    const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-        e.preventDefault();
-    };
-
-    const removeFile = (fileName: string) => {
-        setFiles(files.filter(file => file.name !== fileName));
-    };
-
-    const handleDropZoneClick = () => {
-        // Chỉ trigger input file khi click vào drop zone
-        if (fileInputRef.current) {
-            fileInputRef.current.click();
-        }
-    };
-
     const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
         // Ngăn chặn default behavior để cho phép drop
         e.preventDefault();
@@ -86,6 +65,10 @@ const HomePage = () => {
                 fileInputRef.current.value = '';
             }
         }
+    };
+
+    const removeFile = (fileName: string) => {
+        setFiles(files.filter(file => file.name !== fileName));
     };
 
     const tabs = [
@@ -170,7 +153,7 @@ const HomePage = () => {
                                 <div key={file.name} className="bg-surface2 rounded-full py-1 pl-3 pr-2 flex items-center text-sm">
                                     <span>{file.name}</span>
                                     <span className="text-xs text-primary-muted ml-2">{Math.round(file.size / 1024)} KB</span>
-                                    <button onClick={(e) => removeFile(e, file.name)} className="ml-2 hover:text-status-danger">
+                                    <button onClick={() => removeFile(file.name)} className="ml-2 hover:text-status-danger">
                                         <XIcon className="w-4 h-4" />
                                     </button>
                                 </div>

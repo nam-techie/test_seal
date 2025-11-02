@@ -2,7 +2,7 @@ import React, { useState, FormEvent } from 'react';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import ThemeToggle from '../components/ui/ThemeToggle';
-import { TestFlowLogo, EyeIcon, EyeSlashIcon, GoogleIcon } from '../components/icons/Icons';
+import { TestFlowLogo, EyeIcon, EyeSlashIcon, GoogleIcon, ExclamationCircleIcon } from '../components/icons/Icons';
 import {
   loginWithEmail,
   registerWithEmail,

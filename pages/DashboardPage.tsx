@@ -4,6 +4,7 @@ import Card from '../components/ui/Card';
 import MetricCard from '../components/ui/MetricCard';
 import ChartTooltip from '../components/ui/ChartTooltip';
 import Table from '../components/ui/Table';
+import FilterBar from '../components/ui/FilterBar';
 import { HistoryItem } from '../types';
 import {
   CheckCircleIcon,
@@ -14,87 +15,89 @@ import {
   DocumentArrowDownIcon,
 } from '../components/icons/Icons';
 
+// Custom tooltip formatter
+const formatTooltipValue = (value: number, name: string): [string, string] => {
+  if (name === 'Passed' || name === 'Failed') {
+    return [`${value} tests`, name];
+  }
+  return [value.toString(), name];
+};
+
 const DashboardPage = () => {
-    // Empty state - will be populated from API later
-    const lastRun = { total: 0, passed: 0, failed: 0, durationMs: 0 };
-    const passPercentage = '0.0';
-
-    const pieData = [
-        { name: 'Pass', value: 0 },
-        { name: 'Fail', value: 0 },
-    ];
-    const COLORS = ['#10B981', '#EF4444'];
-
-    const barData: any[] = [];
-    
-    const historyColumns = [
-        { header: 'Run #', accessor: (item: HistoryItem) => <span className="text-accent-cyan font-semibold">{item.runId}</span> },
-        { header: 'Total Tests', accessor: (item: HistoryItem) => item.tests },
-        { header: 'Pass', accessor: (item: HistoryItem) => <span className="text-status-success">{item.pass}</span> },
-        { header: 'Fail', accessor: (item: HistoryItem) => <span className="text-status-danger">{item.fail}</span> },
-        { header: 'Duration', accessor: (item: HistoryItem) => item.duration },
-        { header: 'Date/Time', accessor: (item: HistoryItem) => item.date },
-    ];
-
-    return (
-        <div className="space-y-8">
-            <h1 className="text-3xl font-bold">Reporting Dashboard</h1>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <Card><h3 className="text-primary-muted text-sm font-medium">Pass %</h3><p className="text-3xl font-bold text-status-success">{passPercentage}%</p></Card>
-                <Card><h3 className="text-primary-muted text-sm font-medium">Failed Tests</h3><p className="text-3xl font-bold text-status-danger">{lastRun.failed}</p></Card>
-                <Card><h3 className="text-primary-muted text-sm font-medium">Total Time</h3><p className="text-3xl font-bold">{(lastRun.durationMs / 1000).toFixed(2)}s</p></Card>
-                <Card><h3 className="text-primary-muted text-sm font-medium"># of Tests</h3><p className="text-3xl font-bold">{lastRun.total}</p></Card>
-            </div>
-            
-            <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-                <Card className="lg:col-span-2">
-                    <h2 className="text-xl font-bold mb-4">Pass vs Fail (Last Run)</h2>
-                    <ResponsiveContainer width="100%" height={300}>
-                        <PieChart>
-                            <Pie data={pieData} cx="50%" cy="50%" labelLine={false} outerRadius={110} fill="#8884d8" dataKey="value">
-                                {pieData.map((entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                ))}
-                            </Pie>
-                            <Tooltip contentStyle={{ backgroundColor: '#11162A', border: '1px solid #151B33', borderRadius: '0.75rem' }}/>
-                            <Legend />
-                        </PieChart>
-                    </ResponsiveContainer>
-                </Card>
-                <Card className="lg:col-span-3">
-                    <h2 className="text-xl font-bold mb-4">Last 5 Runs Trend</h2>
-                     <ResponsiveContainer width="100%" height={300}>
-                        <BarChart data={barData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
-                            <XAxis dataKey="name" stroke="#94A3B8" fontSize={12} tickLine={false} axisLine={false} />
-                            <YAxis stroke="#94A3B8" fontSize={12} tickLine={false} axisLine={false} />
-                            <Tooltip contentStyle={{ backgroundColor: '#11162A', border: '1px solid #151B33', borderRadius: '0.75rem' }} cursor={{fill: 'rgba(124, 58, 237, 0.1)'}}/>
-                            <Legend />
-                            <Bar dataKey="pass" stackId="a" fill="#10B981" name="Pass" radius={[4, 4, 0, 0]}/>
-                            <Bar dataKey="fail" stackId="a" fill="#EF4444" name="Fail" radius={[4, 4, 0, 0]}/>
-                        </BarChart>
-                    </ResponsiveContainer>
-                </Card>
-            </div>
-            
-            <Card>
-                <h2 className="text-xl font-bold mb-4">Run History</h2>
-                <Table columns={historyColumns} data={[]} />
-                <div className="mt-4 text-center text-primary-muted">
-                    <p>No test run history available. Execute tests to see history.</p>
-                </div>
-            </Card>
-        </div>
-    );
+  // State management
+  const [isPageLoaded, setIsPageLoaded] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedBranch, setSelectedBranch] = useState('');
+  const [selectedAuthor, setSelectedAuthor] = useState('');
+  
+  // Empty state - will be populated from API later
+  const lastRun = { total: 0, passed: 0, failed: 0, durationMs: 0 };
+  const passPercentage = '0.0';
+  const passPercentageNum = parseFloat(passPercentage) || 0;
+  
+  // Mock trends data - will be populated from API later
+  const trends = {
+    passRate: 0,
+    passed: 0,
+    failed: 0,
+    totalTime: 0,
   };
+  
+  // Mock branches and authors - will be populated from API later
+  const branches: string[] = [];
+  const authors: string[] = [];
+  
+  // Mock history data - will be populated from API later
+  const history: HistoryItem[] = [];
+  
+  // Filter history based on search and filters
+  const filteredHistory = useMemo(() => {
+    return history.filter((item) => {
+      const matchesSearch = !searchQuery || 
+        item.runId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.tests.toString().includes(searchQuery) ||
+        item.date.toLowerCase().includes(searchQuery.toLowerCase());
+      // Note: branch and author filtering can be added when HistoryItem interface is extended
+      return matchesSearch;
+    });
+  }, [history, searchQuery]);
 
-  // Custom tooltip formatter
-  const formatTooltipValue = (value: number, name: string) => {
-    if (name === 'Passed' || name === 'Failed') {
-      return [`${value} tests`, name];
-    }
-    return [value.toString(), name];
+  // Pie chart data with fill colors
+  const pieData = [
+    { name: 'Pass', value: lastRun.passed, fill: '#10B981' },
+    { name: 'Fail', value: lastRun.failed, fill: '#EF4444' },
+  ];
+  
+  const barData: any[] = [];
+  
+  const historyColumns = [
+    { header: 'Run #', accessor: (item: HistoryItem) => <span className="text-accent-cyan font-semibold">{item.runId}</span> },
+    { header: 'Total Tests', accessor: (item: HistoryItem) => item.tests },
+    { header: 'Pass', accessor: (item: HistoryItem) => <span className="text-status-success">{item.pass}</span> },
+    { header: 'Fail', accessor: (item: HistoryItem) => <span className="text-status-danger">{item.fail}</span> },
+    { header: 'Duration', accessor: (item: HistoryItem) => item.duration },
+    { header: 'Date/Time', accessor: (item: HistoryItem) => item.date },
+  ];
+  
+  // Custom label renderer for pie chart
+  const renderCustomLabel = (entry: any) => {
+    const percent = entry.value > 0 ? ((entry.value / (lastRun.passed + lastRun.failed)) * 100).toFixed(1) : 0;
+    return `${entry.name}: ${percent}%`;
   };
+  
+  // Handle refresh button click
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    // TODO: Fetch fresh data from API
+    await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
+    setIsRefreshing(false);
+  };
+  
+  // Page load animation
+  useEffect(() => {
+    setIsPageLoaded(true);
+  }, []);
 
   return (
     <div 

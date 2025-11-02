@@ -225,36 +225,6 @@ describe('login', () => {
                     </code>
                 </pre>
             </Modal>
-            
-            <Drawer isOpen={isDrawerOpen} onClose={() => setDrawerOpen(false)} title="AI Failure Analysis">
-                <div className="space-y-6">
-                    {mockData.aiExplain.map((failure, index) => (
-                        <Card key={index} className="bg-surface2">
-                            <h3 className="font-bold text-lg">{failure.name}</h3>
-                            <p className="text-sm text-status-danger mb-4"><code>{mockData.run.results.find(r => r.name === failure.name)?.error}</code></p>
-                            
-                            <div className="space-y-3 text-sm">
-                                <div>
-                                    <h4 className="font-semibold text-primary-muted">Cause:</h4>
-                                    <p>{failure.cause}</p>
-                                </div>
-                                <div>
-                                    <h4 className="font-semibold text-primary-muted">Suggestion:</h4>
-                                    <p>{failure.suggestion}</p>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <h4 className="font-semibold text-primary-muted">Severity:</h4>
-                                    <Badge variant={failure.severity === 'medium' ? 'warning' : 'danger'}>{failure.severity}</Badge>
-                                </div>
-                            </div>
-                        </Card>
-                    ))}
-                    <Button className="w-full flex items-center justify-center gap-2" onClick={() => navigator.clipboard.writeText(JSON.stringify(mockData.aiExplain, null, 2))}>
-                        <ClipboardIcon /> Copy Summary
-                    </Button>
-                </div>
-            </Drawer>
-
         </div>
     );
 };

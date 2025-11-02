@@ -4,22 +4,162 @@ import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import Tabs from '../components/ui/Tabs';
 import { GithubIcon, CodeBracketIcon, UploadIcon, XIcon, BeakerIcon, PlayIcon, ChartBarIcon, SparklesIcon } from '../components/icons/Icons';
+import { API_ENDPOINTS } from '../config/api';
+
+type TabType = 'github' | 'code' | 'files';
 
 const HomePage = () => {
     const navigate = useNavigate();
     const [files, setFiles] = useState<File[]>([]);
-    const [repoName, setRepoName] = useState('');
-    const [branchName, setBranchName] = useState('');
+    const [githubUrl, setGithubUrl] = useState<string>('');
+    const [codeSnippet, setCodeSnippet] = useState<string>('');
+    const [activeTab, setActiveTab] = useState<TabType>('github');
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [error, setError] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const handleAnalyze = (e?: React.MouseEvent) => {
-        // Ngăn event bubbling nếu có event
+    const handleAnalyzeGithub = async (e?: React.MouseEvent) => {
         if (e) {
             e.stopPropagation();
         }
-        // Here you would typically trigger an API call
-        // For now, we just navigate to the analyze page
-        navigate('/analyze');
+
+        if (!githubUrl.trim()) {
+            setError('Vui lòng nhập GitHub URL');
+            return;
+        }
+
+        setIsLoading(true);
+        setError(null);
+
+        try {
+            const response = await fetch(API_ENDPOINTS.ANALYZE_GITHUB, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    github_url: githubUrl.trim(),
+                    max_files: 20
+                }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.detail || 'Failed to analyze GitHub URL');
+            }
+
+            const data = await response.json();
+            
+            // Lưu kết quả vào sessionStorage để AnalyzePage sử dụng
+            sessionStorage.setItem('analysisResult', JSON.stringify(data));
+            sessionStorage.setItem('analysisType', 'github');
+            
+            navigate('/analyze');
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Có lỗi xảy ra khi phân tích');
+            console.error('Error analyzing GitHub URL:', err);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleAnalyzeCode = async (e?: React.MouseEvent) => {
+        if (e) {
+            e.stopPropagation();
+        }
+
+        if (!codeSnippet.trim()) {
+            setError('Vui lòng nhập code snippet');
+            return;
+        }
+
+        setIsLoading(true);
+        setError(null);
+
+        try {
+            const response = await fetch(API_ENDPOINTS.ANALYZE_CODE, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    code: codeSnippet,
+                    language: 'unknown' // Auto-detect
+                }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.detail || 'Failed to analyze code');
+            }
+
+            const data = await response.json();
+            
+            // Lưu kết quả vào sessionStorage
+            sessionStorage.setItem('analysisResult', JSON.stringify(data));
+            sessionStorage.setItem('analysisType', 'code');
+            
+            navigate('/analyze');
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Có lỗi xảy ra khi phân tích code');
+            console.error('Error analyzing code:', err);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleAnalyzeFiles = async (e?: React.MouseEvent) => {
+        if (e) {
+            e.stopPropagation();
+        }
+
+        if (files.length === 0) {
+            setError('Vui lòng chọn ít nhất một file');
+            return;
+        }
+
+        setIsLoading(true);
+        setError(null);
+
+        try {
+            const formData = new FormData();
+            files.forEach(file => {
+                formData.append('files', file);
+            });
+
+            const response = await fetch(API_ENDPOINTS.ANALYZE_FILES, {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.detail || 'Failed to analyze files');
+            }
+
+            const data = await response.json();
+            
+            // Lưu kết quả vào sessionStorage
+            sessionStorage.setItem('analysisResult', JSON.stringify(data));
+            sessionStorage.setItem('analysisType', 'files');
+            
+            navigate('/analyze');
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Có lỗi xảy ra khi phân tích files');
+            console.error('Error analyzing files:', err);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleAnalyze = (e?: React.MouseEvent) => {
+        if (activeTab === 'github') {
+            handleAnalyzeGithub(e);
+        } else if (activeTab === 'code') {
+            handleAnalyzeCode(e);
+        } else if (activeTab === 'files') {
+            handleAnalyzeFiles(e);
+        }
     };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -76,41 +216,36 @@ const HomePage = () => {
             label: 'GitHub URL',
             content: (
                 <div className="space-y-4">
-                    <div className="flex gap-3 items-stretch">
-                        <div className="flex-1">
-                            <input 
-                                type="text" 
-                                placeholder="username/repo" 
-                                value={repoName}
-                                onChange={(e) => setRepoName(e.target.value)}
-                                className="w-full bg-surface2 border border-surface2 rounded-lg py-3 px-4 text-primary placeholder:text-primary-muted focus:outline-none focus:ring-2 focus:ring-accent-violet focus:border-transparent transition-all font-mono text-sm" 
-                            />
-                        </div>
-                        <div className="w-32">
-                            <input 
-                                type="text" 
-                                placeholder="branch" 
-                                value={branchName}
-                                onChange={(e) => setBranchName(e.target.value)}
-                                className="w-full bg-surface2 border border-surface2 rounded-lg py-3 px-4 text-primary placeholder:text-primary-muted focus:outline-none focus:ring-2 focus:ring-accent-violet focus:border-transparent transition-all font-mono text-sm" 
-                            />
-                        </div>
-                        <Button 
-                            onClick={handleAnalyze} 
-                            disabled={!repoName.trim()}
-                            variant="primary"
-                            className="px-6 flex items-center justify-center gap-2 whitespace-nowrap"
-                        >
-                            Fetch
-                        </Button>
+                    <div className="relative">
+                        <GithubIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-primary-muted" />
+                        <input 
+                            type="text" 
+                            placeholder="https://github.com/username/repo" 
+                            className="w-full bg-background border border-surface2 rounded-lg py-3 pl-12 pr-4 focus:outline-none focus:ring-2 focus:ring-accent-violet"
+                            value={githubUrl}
+                            onChange={(e) => setGithubUrl(e.target.value)}
+                            onKeyPress={(e) => {
+                                if (e.key === 'Enter' && !isLoading) {
+                                    handleAnalyzeGithub();
+                                }
+                            }}
+                        />
                     </div>
                     <Button 
-                        onClick={handleAnalyze} 
-                        disabled={!repoName.trim() || !branchName.trim()}
-                        variant="action"
+                        onClick={handleAnalyzeGithub} 
                         className="w-full flex justify-center items-center gap-2"
+                        disabled={isLoading || !githubUrl.trim()}
                     >
-                        <SparklesIcon className="w-4 h-4" /> Analyze & Generate Tests
+                        {isLoading ? (
+                            <>
+                                <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                                Analyzing...
+                            </>
+                        ) : (
+                            <>
+                                <SparklesIcon/> Analyze & Generate Tests
+                            </>
+                        )}
                     </Button>
                 </div>
             )
@@ -119,8 +254,19 @@ const HomePage = () => {
             label: 'Code Snippet',
             content: (
                 <div className="space-y-4">
-                    <textarea placeholder="// Paste your code snippet here..." className="w-full h-40 bg-background border border-surface2 rounded-lg p-4 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-accent-violet"></textarea>
-                    <Button onClick={handleAnalyze} className="w-full">Analyze Snippet</Button>
+                    <textarea 
+                        placeholder="// Paste your code snippet here..." 
+                        className="w-full h-40 bg-background border border-surface2 rounded-lg p-4 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-accent-violet"
+                        value={codeSnippet}
+                        onChange={(e) => setCodeSnippet(e.target.value)}
+                    />
+                    <Button 
+                        onClick={handleAnalyzeCode} 
+                        className="w-full"
+                        disabled={isLoading || !codeSnippet.trim()}
+                    >
+                        {isLoading ? 'Analyzing...' : 'Analyze Snippet'}
+                    </Button>
                 </div>
             )
         },
@@ -160,7 +306,13 @@ const HomePage = () => {
                             ))}
                         </div>
                     )}
-                     <Button onClick={handleAnalyze} className="w-full relative z-10" disabled={files.length === 0}>Analyze Files</Button>
+                     <Button 
+                        onClick={handleAnalyzeFiles} 
+                        className="w-full relative z-10" 
+                        disabled={files.length === 0 || isLoading}
+                    >
+                        {isLoading ? 'Analyzing...' : 'Analyze Files'}
+                    </Button>
                 </div>
             )
         }
@@ -177,7 +329,25 @@ const HomePage = () => {
 
             <Card glow={true}>
                 <h2 className="text-2xl font-bold mb-4">Start a New Test Analysis</h2>
-                <Tabs tabs={tabs} />
+                {error && (
+                    <div className="mb-4 p-3 bg-status-danger/10 border border-status-danger/50 rounded-lg text-status-danger text-sm">
+                        {error}
+                    </div>
+                )}
+                <Tabs 
+                    tabs={tabs} 
+                    activeTab={tabs.findIndex((t, i) => {
+                        if (i === 0 && activeTab === 'github') return true;
+                        if (i === 1 && activeTab === 'code') return true;
+                        if (i === 2 && activeTab === 'files') return true;
+                        return false;
+                    })}
+                    onTabChange={(tabIndex) => {
+                        const newTab: TabType = tabIndex === 0 ? 'github' : tabIndex === 1 ? 'code' : 'files';
+                        setActiveTab(newTab);
+                        setError(null);
+                    }}
+                />
             </Card>
 
             <Card>

@@ -7,10 +7,26 @@ interface Tab {
 
 interface TabsProps {
   tabs: Tab[];
+  activeTab?: number | string;
+  onTabChange?: (tab: number | string) => void;
 }
 
-const Tabs: React.FC<TabsProps> = ({ tabs }) => {
-  const [activeTab, setActiveTab] = useState(0);
+const Tabs: React.FC<TabsProps> = ({ tabs, activeTab: controlledActiveTab, onTabChange }) => {
+  const [internalActiveTab, setInternalActiveTab] = useState(0);
+  
+  // Use controlled if provided, otherwise use internal state
+  const activeTab = controlledActiveTab !== undefined ? 
+    (typeof controlledActiveTab === 'number' ? controlledActiveTab : 
+     tabs.findIndex(t => t.label.toLowerCase().replace(/\s+/g, '') === String(controlledActiveTab).toLowerCase())) :
+    internalActiveTab;
+  
+  const handleTabChange = (index: number) => {
+    if (onTabChange) {
+      onTabChange(index);
+    } else {
+      setInternalActiveTab(index);
+    }
+  };
 
   return (
     <div>
@@ -19,7 +35,7 @@ const Tabs: React.FC<TabsProps> = ({ tabs }) => {
           {tabs.map((tab, index) => (
             <button
               key={tab.label}
-              onClick={() => setActiveTab(index)}
+              onClick={() => handleTabChange(index)}
               className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200
                 ${
                   activeTab === index

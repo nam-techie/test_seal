@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { BellIcon, SearchIcon, UserIcon, CogIcon, LogoutIcon } from '../icons/Icons';
+import ThemeToggle from '../ui/ThemeToggle';
 import { logout } from '../../services/auth';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -33,6 +34,7 @@ const TopBar: React.FC = () => {
         />
       </div>
       <div className="flex items-center space-x-4">
+        <ThemeToggle />
         <button className="p-2 rounded-full hover:bg-surface2">
           <BellIcon className="text-primary-muted" />
         </button>
@@ -53,19 +55,19 @@ const TopBar: React.FC = () => {
               <div className="absolute right-0 mt-2 w-48 bg-surface2 rounded-xl shadow-lg py-2 z-20">
                 <a
                   href="#/profile"
-                  className="flex items-center px-4 py-2 text-sm text-primary-muted hover:bg-surface hover:text-white"
+                  className="flex items-center px-4 py-2 text-sm text-primary-muted hover:bg-surface2 hover:text-primary"
                 >
                   <UserIcon className="w-4 h-4 mr-3" /> Profile
                 </a>
                 <a
                   href="#/settings"
-                  className="flex items-center px-4 py-2 text-sm text-primary-muted hover:bg-surface hover:text-white"
+                  className="flex items-center px-4 py-2 text-sm text-primary-muted hover:bg-surface2 hover:text-primary"
                 >
                   <CogIcon className="w-4 h-4 mr-3" /> Settings
                 </a>
                 <button
                   onClick={handleLogout}
-                  className="w-full text-left flex items-center px-4 py-2 text-sm text-primary-muted hover:bg-surface hover:text-white"
+                  className="w-full text-left flex items-center px-4 py-2 text-sm text-primary-muted hover:bg-surface2 hover:text-primary"
                 >
                   <LogoutIcon className="w-4 h-4 mr-3" /> Logout
                 </button>

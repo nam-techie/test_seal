@@ -10,18 +10,19 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
+        darkMode: 'class',
         theme: {
           extend: {
             fontFamily: {
               sans: ['Inter', 'sans-serif'],
             },
             colors: {
-              background: '#0B1020',
-              surface: '#11162A',
-              surface2: '#151B33',
+              background: 'var(--color-background)',
+              surface: 'var(--color-surface)',
+              surface2: 'var(--color-surface2)',
               primary: {
-                DEFAULT: '#E5E7EB',
-                muted: '#94A3B8'
+                DEFAULT: 'var(--color-primary)',
+                muted: 'var(--color-primary-muted)'
               },
               accent: {
                 cyan: '#22D3EE',
@@ -45,12 +46,44 @@
       }
     </script>
     <style>
+      :root {
+        /* Dark mode colors (default) */
+        --color-background: #0B1020;
+        --color-surface: #11162A;
+        --color-surface2: #151B33;
+        --color-primary: #E5E7EB;
+        --color-primary-muted: #94A3B8;
+      }
+
+      .light {
+        /* Light mode colors */
+        --color-background: #FFFFFF;
+        --color-surface: #F8F9FA;
+        --color-surface2: #E9ECEF;
+        --color-primary: #212529;
+        --color-primary-muted: #6C757D;
+      }
+
+      .dark {
+        /* Dark mode colors */
+        --color-background: #0B1020;
+        --color-surface: #11162A;
+        --color-surface2: #151B33;
+        --color-primary: #E5E7EB;
+        --color-primary-muted: #94A3B8;
+      }
+
       body {
-        background-color: #0B1020;
+        background-color: var(--color-background);
         font-family: 'Inter', sans-serif;
-        color: #E5E7EB;
+        color: var(--color-primary);
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      html {
+        transition: background-color 0.3s ease;
       }
     </style>
   <script type="importmap">
@@ -70,6 +103,14 @@
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
+    <script>
+      // Initialize theme class on page load
+      (function() {
+        const savedTheme = localStorage.getItem('theme');
+        const theme = savedTheme || (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+        document.documentElement.classList.add(theme);
+      })();
+    </script>
     <!-- Dependencies -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>

@@ -1,6 +1,7 @@
 import React, { useState, FormEvent } from 'react';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
+import ThemeToggle from '../components/ui/ThemeToggle';
 import { TestFlowLogo, EyeIcon, EyeSlashIcon, GoogleIcon } from '../components/icons/Icons';
 import {
   loginWithEmail,
@@ -91,6 +92,9 @@ const AuthPage: React.FC = () => {
     <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 bg-gradient-g2">
       <div className="absolute top-8 left-8">
         <TestFlowLogo />
+      </div>
+      <div className="absolute top-8 right-8">
+        <ThemeToggle />
       </div>
       <Card className="w-full max-w-md" glow={true}>
         <div className="text-center mb-6">

@@ -27,6 +27,9 @@ import {
   RefreshCw,
   Eye,
   EyeOff,
+  AlertCircle,
+  MessageCircle,
+  Send,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -65,6 +68,9 @@ export const DocumentArrowDownIcon = createIconComponent(Download);
 export const RefreshIcon = createIconComponent(RefreshCw);
 export const EyeIcon = createIconComponent(Eye);
 export const EyeSlashIcon = createIconComponent(EyeOff);
+export const ExclamationCircleIcon = createIconComponent(AlertCircle);
+export const ChatBubbleIcon = createIconComponent(MessageCircle);
+export const SendIcon = createIconComponent(Send);
 
 // TestFlowLogo giữ nguyên (custom component)
 export const TestFlowLogo = () => {
@@ -78,7 +84,7 @@ export const TestFlowLogo = () => {
   );
 };
 
-// GoogleIcon giữ nguyên (SVG custom cho brand)
+// GoogleIcon giữ nguyên (custom component)
 export const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 24 24" width="20" height="20" {...props}>
     <path

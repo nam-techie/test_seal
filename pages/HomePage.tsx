@@ -9,7 +9,7 @@ const HomePage = () => {
     const navigate = useNavigate();
     const [files, setFiles] = useState<File[]>([]);
     const [repoName, setRepoName] = useState('');
-    const [branchName, setBranchName] = useState('main');
+    const [branchName, setBranchName] = useState('');
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleAnalyze = (e?: React.MouseEvent) => {
@@ -37,17 +37,8 @@ const HomePage = () => {
         }
     };
 
-    const removeFile = (e: React.MouseEvent, fileName: string) => {
-        // Ngăn event bubbling để không trigger drop zone click
-        e.stopPropagation();
-        setFiles(files.filter(file => file.name !== fileName));
-    };
-
-    const handleDropZoneClick = () => {
-        // Chỉ trigger input file khi click vào drop zone
-        if (fileInputRef.current) {
-            fileInputRef.current.click();
-        }
+    const handleBrowseClick = () => {
+        fileInputRef.current?.click();
     };
 
     const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
@@ -74,6 +65,10 @@ const HomePage = () => {
                 fileInputRef.current.value = '';
             }
         }
+    };
+
+    const removeFile = (fileName: string) => {
+        setFiles(files.filter(file => file.name !== fileName));
     };
 
     const tabs = [
@@ -135,21 +130,22 @@ const HomePage = () => {
                 <div className="space-y-4">
                     <div 
                         className="border-2 border-dashed border-surface2 rounded-lg p-8 text-center relative cursor-pointer"
-                        onClick={handleDropZoneClick}
-                        onDragOver={handleDragOver}
                         onDrop={handleDrop}
+                        onDragOver={handleDragOver}
+                        onClick={handleBrowseClick}
                     >
-                        <UploadIcon className="mx-auto h-12 w-12 text-primary-muted" />
-                        <p className="mt-2 text-sm text-primary-muted">Drag & drop files or click to browse</p>
-                        <p className="text-xs text-primary-muted/70">Max 10 files, 1MB per file</p>
                         <input 
-                            ref={fileInputRef}
                             type="file" 
+                            ref={fileInputRef}
                             multiple 
                             onChange={handleFileChange} 
                             className="hidden" 
-                            accept="*/*"
                         />
+                        <div className="inline-flex flex-col items-center">
+                            <UploadIcon className="h-12 w-12 text-primary-muted" />
+                            <p className="mt-2 text-sm text-primary-muted">Drag & drop files or click to browse</p>
+                        </div>
+                        <p className="text-xs text-primary-muted/70 mt-2">Max 10 files, 1MB per file</p>
                     </div>
                     {files.length > 0 && (
                         <div className="flex flex-wrap gap-2">
@@ -157,7 +153,7 @@ const HomePage = () => {
                                 <div key={file.name} className="bg-surface2 rounded-full py-1 pl-3 pr-2 flex items-center text-sm">
                                     <span>{file.name}</span>
                                     <span className="text-xs text-primary-muted ml-2">{Math.round(file.size / 1024)} KB</span>
-                                    <button onClick={(e) => removeFile(e, file.name)} className="ml-2 hover:text-status-danger">
+                                    <button onClick={() => removeFile(file.name)} className="ml-2 hover:text-status-danger">
                                         <XIcon className="w-4 h-4" />
                                     </button>
                                 </div>

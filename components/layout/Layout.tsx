@@ -2,6 +2,7 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import TopBar from './TopBar';
+import ChatWidget from '../ui/ChatWidget';
 
 const Layout: React.FC = () => {
   return (
@@ -18,6 +19,7 @@ const Layout: React.FC = () => {
           © {new Date().getFullYear()} Test Studio AI
         </footer>
       </div>
+      <ChatWidget />
     </div>
   );
 };

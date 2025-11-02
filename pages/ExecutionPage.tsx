@@ -6,9 +6,9 @@ import Badge from '../components/ui/Badge';
 import ProgressBar from '../components/ui/ProgressBar';
 import Modal from '../components/ui/Modal';
 import Drawer from '../components/ui/Drawer';
-import { mockData } from '../data/mock';
-import { RunResult } from '../types';
+import { RunResult, SuggestedTest } from '../types';
 import { CheckCircleIcon, XCircleIcon, XIcon, TerminalIcon, InformationCircleIcon, ClipboardIcon, SparklesIcon } from '../components/icons/Icons';
+import { API_ENDPOINTS } from '../config/api';
 
 // Sub-component for the new Test Log Modal
 const TestLogModal = ({ isOpen, onClose, result }: { isOpen: boolean, onClose: () => void, result: RunResult | null }) => {
@@ -101,35 +101,212 @@ const ExecutionPage = () => {
     const [isComplete, setIsComplete] = useState(false);
     const [isCodeModalOpen, setCodeModalOpen] = useState(false);
     const [isDrawerOpen, setDrawerOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [generatedTestCode, setGeneratedTestCode] = useState<string>('');
+    const [framework, setFramework] = useState<string>('unknown');
+    const [language, setLanguage] = useState<string>('unknown');
     
     // State for the new modal
     const [isLogModalOpen, setLogModalOpen] = useState(false);
     const [selectedResult, setSelectedResult] = useState<RunResult | null>(null);
 
     useEffect(() => {
-        const testsToRun = mockData.run.results;
-        const totalTests = testsToRun.length;
-        let completedTests = 0;
+        let isMounted = true; // Flag để tránh update state sau khi component unmount
         
-        const initialResults: RunResult[] = testsToRun.map(t => ({ ...t, status: 'running', timeMs: null }));
-        setRunResults(initialResults);
-
-        const runTest = (index: number) => {
-            if (index >= totalTests) {
+        const executeTests = async () => {
+            try {
+                setIsLoading(true);
+                setError(null);
+                
+                // Get selected tests và context từ sessionStorage
+                const selectedTestsStr = sessionStorage.getItem('selectedTests');
+                const contextStr = sessionStorage.getItem('executeContext');
+                
+                if (!selectedTestsStr) {
+                    setError('No tests selected. Please go back and select tests to run.');
+                    setIsLoading(false);
+                    return;
+                }
+                
+                const selectedTests: SuggestedTest[] = JSON.parse(selectedTestsStr);
+                const context = contextStr ? JSON.parse(contextStr) : {};
+                
+                // Prepare test cases for API
+                const testCases = selectedTests.map(tc => ({
+                    id: tc.id,
+                    name: tc.name,
+                    function: tc.function,
+                    type: tc.type,
+                    complexity: tc.complexity,
+                    // Include additional fields nếu có
+                    description: (tc as any).description || '',
+                    steps: (tc as any).steps || [],
+                    expectedResult: (tc as any).expectedResult || ''
+                }));
+                
+                // Set initial running state
+                const initialResults: RunResult[] = selectedTests.map((tc, idx) => ({
+                    id: idx + 1,
+                    name: tc.name,
+                    status: 'running' as const,
+                    timeMs: null,
+                    log: `[INFO] Preparing to run test: ${tc.name}...`,
+                    branch: 'main',
+                    author: 'System'
+                }));
+                setRunResults(initialResults);
+                setProgress(0);
+                
+                // Call API to execute tests
+                const response = await fetch(API_ENDPOINTS.EXECUTE_TESTS, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        test_cases: testCases,
+                        original_code: context.original_code || '',
+                        language: context.language || 'unknown',
+                        framework: null, // Auto-detect
+                        risks: context.risks || [] // Truyền risks từ analysis
+                    })
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({ detail: 'Unknown error' }));
+                    throw new Error(errorData.detail || `HTTP ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (!data.success) {
+                    throw new Error(data.error || 'Execution failed');
+                }
+                
+                // Update UI with results
+                setFramework(data.summary?.framework || data.generated_code?.framework || 'unknown');
+                setLanguage(data.summary?.language || 'unknown');
+                setGeneratedTestCode(data.generated_code?.code || '');
+                
+                const execution = data.execution || {};
+                const results = execution.results || [];
+                
+                // Convert API results to RunResult format - match by test name to ensure correct mapping
+                // Create a map of results by name for accurate matching
+                const resultsMap = new Map<string, any>();
+                results.forEach((r: any) => {
+                    const testName = r.name || '';
+                    resultsMap.set(testName, r);
+                });
+                
+                // Map results back to original test order, matching by name
+                // Use stricter matching - only use fallback if absolutely necessary
+                const finalResults: RunResult[] = selectedTests.map((tc, idx) => {
+                    // Try exact match first
+                    let apiResult = resultsMap.get(tc.name);
+                    
+                    // If no exact match, try partial match (test name contains tc.name or vice versa)
+                    if (!apiResult) {
+                        for (const [resultName, resultData] of resultsMap.entries()) {
+                            const tcNameLower = tc.name.toLowerCase();
+                            const resultNameLower = resultName.toLowerCase();
+                            if (tcNameLower === resultNameLower || 
+                                resultNameLower.includes(tcNameLower) || 
+                                tcNameLower.includes(resultNameLower)) {
+                                apiResult = resultData;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    // Last resort: use index-based fallback
+                    if (!apiResult && idx < results.length) {
+                        apiResult = results[idx];
+                    }
+                    
+                    if (!apiResult) {
+                        // If no matching result found, keep as running (shouldn't happen)
+                        return {
+                            id: idx + 1,
+                            name: tc.name,
+                            status: 'running' as const,
+                            timeMs: null,
+                            log: `[INFO] Test result not found for: ${tc.name}`,
+                            branch: 'main',
+                            author: 'System'
+                        };
+                    }
+                    
+                    // Ensure status is correctly mapped - only accept 'pass' or 'fail'
+                    const status = apiResult.status === 'pass' ? 'pass' as const : 
+                                   apiResult.status === 'fail' ? 'fail' as const : 
+                                   'running' as const;
+                    
+                    return {
+                        id: apiResult.id || idx + 1,
+                        name: apiResult.name || tc.name,
+                        status: status,
+                        timeMs: apiResult.timeMs || 0,
+                        log: apiResult.log || '',
+                        error: apiResult.error,
+                        branch: 'main',
+                        author: 'System',
+                        executedAt: apiResult.executedAt || new Date().toISOString()
+                    };
+                });
+                
+                // If API returned more results than selected tests, append them
+                if (results.length > selectedTests.length) {
+                    results.slice(selectedTests.length).forEach((r: any, idx: number) => {
+                        const status = r.status === 'pass' ? 'pass' as const : 
+                                       r.status === 'fail' ? 'fail' as const : 
+                                       'running' as const;
+                        finalResults.push({
+                            id: r.id || selectedTests.length + idx + 1,
+                            name: r.name || `Test ${selectedTests.length + idx + 1}`,
+                            status: status,
+                            timeMs: r.timeMs || 0,
+                            log: r.log || '',
+                            error: r.error,
+                            branch: 'main',
+                            author: 'System',
+                            executedAt: r.executedAt || new Date().toISOString()
+                        });
+                    });
+                }
+                
+                // Only update state if component is still mounted
+                if (!isMounted) return;
+                
+                // Set all states together để tránh multiple re-renders
+                setRunResults(finalResults);
+                setProgress(100);
                 setIsComplete(true);
-                setDrawerOpen(mockData.run.failed > 0);
-                return;
+                
+                // Show drawer nếu có failed tests
+                const failedCount = finalResults.filter(r => r.status === 'fail').length;
+                if (failedCount > 0) {
+                    setDrawerOpen(true);
+                }
+                
+            } catch (err: any) {
+                if (!isMounted) return;
+                console.error('Error executing tests:', err);
+                setError(err.message || 'Failed to execute tests');
+            } finally {
+                if (isMounted) {
+                    setIsLoading(false);
+                }
             }
-
-            setTimeout(() => {
-                setRunResults(prev => prev.map((r, i) => i === index ? { ...testsToRun[index] } : r));
-                completedTests++;
-                setProgress(Math.round((completedTests / totalTests) * 100));
-                runTest(index + 1);
-            }, 1000 + Math.random() * 1500);
         };
-
-        runTest(0);
+        
+        executeTests();
+        
+        // Cleanup function
+        return () => {
+            isMounted = false;
+        };
     }, []);
 
     const handleViewLog = (result: RunResult) => {
@@ -187,17 +364,36 @@ const ExecutionPage = () => {
                 <div className="space-y-4">
                     <div className="flex justify-between items-center">
                         <h2 className="text-xl font-bold">Run Progress</h2>
-                        {isComplete && <Badge variant={mockData.run.failed > 0 ? 'danger' : 'success'}>Run Complete</Badge>}
+                        {isComplete && (
+                            <Badge variant={runResults.filter(r => r.status === 'fail').length > 0 ? 'danger' : 'success'}>
+                                Run Complete
+                            </Badge>
+                        )}
                     </div>
                     <div className="flex items-center gap-4">
                         <ProgressBar progress={progress} />
                         <span className="font-semibold">{progress}%</span>
                     </div>
-                    <div className="flex space-x-4">
-                        <Badge variant="info">Selected: {mockData.run.total}</Badge>
-                        <Badge variant="info">Framework: Jest</Badge>
-                        <Badge variant="info">Language: TypeScript</Badge>
+                    <div className="flex space-x-4 items-center">
+                        <Badge variant="info">Selected: {runResults.length}</Badge>
+                        <Badge variant="info">Framework: {framework}</Badge>
+                        <Badge variant="info">Language: {language}</Badge>
+                        {generatedTestCode && (
+                            <Button 
+                                variant="secondary" 
+                                onClick={() => setCodeModalOpen(true)}
+                                className="ml-auto flex items-center gap-2"
+                            >
+                                <ClipboardIcon className="w-4 h-4" />
+                                View Generated Test Code
+                            </Button>
+                        )}
                     </div>
+                    {error && (
+                        <div className="bg-status-danger/10 border border-status-danger/50 p-4 rounded-lg text-status-danger">
+                            <strong>Error:</strong> {error}
+                        </div>
+                    )}
                 </div>
             </Card>
 
@@ -206,52 +402,107 @@ const ExecutionPage = () => {
                 <Table columns={columns} data={runResults} />
             </Card>
 
+            {generatedTestCode && (
+                <Card>
+                    <div className="flex justify-between items-center mb-4">
+                        <h2 className="text-xl font-bold flex items-center gap-2">
+                            <ClipboardIcon className="w-6 h-6" />
+                            Generated Test Code
+                        </h2>
+                        <div className="flex gap-2">
+                            <Badge variant="info">{framework}</Badge>
+                            <Badge variant="info">{language}</Badge>
+                            <Button 
+                                variant="ghost" 
+                                onClick={() => {
+                                    navigator.clipboard.writeText(generatedTestCode);
+                                    alert('Test code copied to clipboard!');
+                                }}
+                                className="flex items-center gap-2"
+                            >
+                                <ClipboardIcon className="w-4 h-4" />
+                                Copy
+                            </Button>
+                        </div>
+                    </div>
+                    <div className="space-y-2">
+                        <pre className="bg-background p-4 rounded-lg text-sm text-primary-muted whitespace-pre-wrap max-h-96 overflow-y-auto font-mono border border-surface2">
+                            <code>
+                                {generatedTestCode}
+                            </code>
+                        </pre>
+                        <p className="text-xs text-primary-muted">
+                            💡 This is the test code generated by AI Agent. You can copy it and save to a file with appropriate extension.
+                        </p>
+                    </div>
+                </Card>
+            )}
+
             <TestLogModal isOpen={isLogModalOpen} onClose={() => setLogModalOpen(false)} result={selectedResult} />
             
-            <Modal isOpen={isCodeModalOpen} onClose={() => setCodeModalOpen(false)} title="Test Code: login.test.ts">
-                <pre className="bg-background p-4 rounded-lg text-sm text-primary-muted whitespace-pre-wrap">
-                    <code>
-{`
-describe('login', () => {
-    it('should return a JWT for valid credentials', async () => {
-        // test implementation...
-    });
-
-    it('should return 401 for invalid credentials', async () => {
-        // test implementation...
-    });
-});
-`}
-                    </code>
-                </pre>
+            <Modal isOpen={isCodeModalOpen} onClose={() => setCodeModalOpen(false)} title={`Generated Test Code (${framework})`}>
+                <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                        <div className="flex gap-2">
+                            <Badge variant="info">{framework}</Badge>
+                            <Badge variant="info">{language}</Badge>
+                        </div>
+                        <Button 
+                            variant="ghost" 
+                            onClick={() => {
+                                if (generatedTestCode) {
+                                    navigator.clipboard.writeText(generatedTestCode);
+                                    alert('Test code copied to clipboard!');
+                                }
+                            }}
+                            className="flex items-center gap-2"
+                            disabled={!generatedTestCode}
+                        >
+                            <ClipboardIcon className="w-4 h-4" />
+                            Copy Code
+                        </Button>
+                    </div>
+                    <pre className="bg-background p-4 rounded-lg text-sm text-primary-muted whitespace-pre-wrap max-h-96 overflow-y-auto font-mono">
+                        <code>
+                            {generatedTestCode || 'No test code generated yet'}
+                        </code>
+                    </pre>
+                    {generatedTestCode && (
+                        <div className="text-xs text-primary-muted bg-surface2 p-2 rounded">
+                            💡 Tip: You can copy this test code and save it to a file with the appropriate extension (e.g., {language === 'java' ? '.java' : language === 'python' ? '.py' : language === 'javascript' ? '.js' : '.test'})
+                        </div>
+                    )}
+                </div>
             </Modal>
             
-            <Drawer isOpen={isDrawerOpen} onClose={() => setDrawerOpen(false)} title="AI Failure Analysis">
+            <Drawer isOpen={isDrawerOpen} onClose={() => setDrawerOpen(false)} title="Test Execution Results">
                 <div className="space-y-6">
-                    {mockData.aiExplain.map((failure, index) => (
+                    {runResults.filter(r => r.status === 'fail').map((failure, index) => (
                         <Card key={index} className="bg-surface2">
                             <h3 className="font-bold text-lg">{failure.name}</h3>
-                            <p className="text-sm text-status-danger mb-4"><code>{mockData.run.results.find(r => r.name === failure.name)?.error}</code></p>
+                            {failure.error && (
+                                <p className="text-sm text-status-danger mb-4"><code>{failure.error}</code></p>
+                            )}
                             
-                            <div className="space-y-3 text-sm">
-                                <div>
-                                    <h4 className="font-semibold text-primary-muted">Cause:</h4>
-                                    <p>{failure.cause}</p>
+                            {failure.log && (
+                                <div className="space-y-3 text-sm">
+                                    <div>
+                                        <h4 className="font-semibold text-primary-muted mb-2">Log:</h4>
+                                        <pre className="bg-background p-3 rounded text-xs whitespace-pre-wrap max-h-40 overflow-y-auto">
+                                            {failure.log}
+                                        </pre>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <h4 className="font-semibold text-primary-muted">Duration:</h4>
+                                        <Badge variant="info">{failure.timeMs}ms</Badge>
+                                    </div>
                                 </div>
-                                <div>
-                                    <h4 className="font-semibold text-primary-muted">Suggestion:</h4>
-                                    <p>{failure.suggestion}</p>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <h4 className="font-semibold text-primary-muted">Severity:</h4>
-                                    <Badge variant={failure.severity === 'medium' ? 'warning' : 'danger'}>{failure.severity}</Badge>
-                                </div>
-                            </div>
+                            )}
                         </Card>
                     ))}
-                    <Button className="w-full flex items-center justify-center gap-2" onClick={() => navigator.clipboard.writeText(JSON.stringify(mockData.aiExplain, null, 2))}>
-                        <ClipboardIcon /> Copy Summary
-                    </Button>
+                    {runResults.filter(r => r.status === 'fail').length === 0 && (
+                        <p className="text-primary-muted">All tests passed! 🎉</p>
+                    )}
                 </div>
             </Drawer>
 

@@ -2,24 +2,20 @@ import React from 'react';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import Card from '../components/ui/Card';
 import Table from '../components/ui/Table';
-import { mockData } from '../data/mock';
 import { HistoryItem } from '../types';
 
 const DashboardPage = () => {
-    const lastRun = mockData.run;
-    const passPercentage = lastRun.total > 0 ? ((lastRun.passed / lastRun.total) * 100).toFixed(1) : '0.0';
+    // Empty state - will be populated from API later
+    const lastRun = { total: 0, passed: 0, failed: 0, durationMs: 0 };
+    const passPercentage = '0.0';
 
     const pieData = [
-        { name: 'Pass', value: lastRun.passed },
-        { name: 'Fail', value: lastRun.failed },
+        { name: 'Pass', value: 0 },
+        { name: 'Fail', value: 0 },
     ];
     const COLORS = ['#10B981', '#EF4444'];
 
-    const barData = mockData.history.slice(0, 5).reverse().map(h => ({
-        name: h.runId,
-        pass: h.pass,
-        fail: h.fail,
-    }));
+    const barData: any[] = [];
     
     const historyColumns = [
         { header: 'Run #', accessor: (item: HistoryItem) => <span className="text-accent-cyan font-semibold">{item.runId}</span> },
@@ -73,7 +69,10 @@ const DashboardPage = () => {
             
             <Card>
                 <h2 className="text-xl font-bold mb-4">Run History</h2>
-                <Table columns={historyColumns} data={mockData.history} />
+                <Table columns={historyColumns} data={[]} />
+                <div className="mt-4 text-center text-primary-muted">
+                    <p>No test run history available. Execute tests to see history.</p>
+                </div>
             </Card>
         </div>
     );

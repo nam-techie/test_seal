@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import Card from '../components/ui/Card';
 import Table from '../components/ui/Table';
 import Button from '../components/ui/Button';
-import { mockData } from '../data/mock';
 import { HistoryItem } from '../types';
 import { EllipsisVerticalIcon, DocumentArrowDownIcon } from '../components/icons/Icons';
 
@@ -76,13 +75,9 @@ const HistoryPage = () => {
         <div className="space-y-8">
             <h1 className="text-3xl font-bold">Run History</h1>
             <Card>
-                 <Table columns={historyColumns} data={mockData.history} />
+                 <Table columns={historyColumns} data={[]} />
                  <div className="flex justify-between items-center mt-4">
-                     <p className="text-sm text-primary-muted">Showing 1-5 of 50 results</p>
-                     <div className="space-x-2">
-                        <Button variant="secondary">Previous</Button>
-                        <Button variant="secondary">Next</Button>
-                     </div>
+                     <p className="text-sm text-primary-muted">No test run history available</p>
                  </div>
             </Card>
         </div>
